@@ -67,3 +67,6 @@ If you have any questions or need further assistance, please contact the project
 I want you to know that contributions to this project are welcome. Please open an issue or submit a pull request if you have any ideas, bug fixes, or improvements.
 
 ## License
+
+This project is licensed under the [MIT License](LICENSE).
+
