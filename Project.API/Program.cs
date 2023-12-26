@@ -6,17 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Project.Core.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Register DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PrimaryDbConnection")));
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Register ILogger service
 builder.Services.AddLogging(loggingBuilder =>
 {
-    loggingBuilder.AddSeq(builder.Configuration.GetSection("Seq"));
+    loggingBuilder.AddSeq(builder.Configuration.GetSection("SeqConfig"));
 });
 
 // Register Services

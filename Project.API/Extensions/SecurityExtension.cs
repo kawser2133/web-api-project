@@ -30,17 +30,17 @@ namespace Project.API.Extensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(jwt =>
             {
-                var key = Encoding.ASCII.GetBytes(configuration["JwtConfig:Secret"]);
+                var key = Encoding.ASCII.GetBytes(configuration["AppSettings:JwtConfig:Secret"]);
                 jwt.SaveToken = true;
                 jwt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidAudience = configuration["JwtConfig:ValidAudience"],
-                    ValidIssuer = configuration["JwtConfig:ValidIssuer"],
-                    ValidateLifetime = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["AppSettings:JwtConfig:ValidAudience"],
+                    ValidIssuer = configuration["AppSettings:JwtConfig:ValidIssuer"],
+                    ValidateLifetime = true,
                     RequireExpirationTime = true,
                     ClockSkew = TimeSpan.Zero
                 };

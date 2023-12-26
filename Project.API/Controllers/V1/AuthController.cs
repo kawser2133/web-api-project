@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Project.Core.Common;
+using Microsoft.Extensions.Options;
 
 namespace Project.API.Controllers.V1
 {
@@ -18,15 +20,18 @@ namespace Project.API.Controllers.V1
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
 
         public AuthController(
             ILogger<AuthController> logger,
             IAuthService authService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _authService = authService;
             _configuration = configuration;
+            _appSettings = appSettings.Value;
         }
 
         [HttpPost, Route("login")]
@@ -91,12 +96,12 @@ namespace Project.API.Controllers.V1
         private AuthResultViewModel GenerateJwtToken(ResponseViewModel<UserViewModel> auth)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JwtConfig:Secret"]);
+            var key = Encoding.ASCII.GetBytes(_appSettings.JwtConfig.Secret);
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Aud, _configuration["JwtConfig:ValidAudience"]),
-                new Claim(JwtRegisteredClaimNames.Iss, _configuration["JwtConfig:ValidIssuer"]),
+                new Claim(JwtRegisteredClaimNames.Aud, _appSettings.JwtConfig.ValidAudience),
+                new Claim(JwtRegisteredClaimNames.Iss, _appSettings.JwtConfig.ValidIssuer),
                 new Claim(JwtRegisteredClaimNames.Sub, auth.Data.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
@@ -104,7 +109,7 @@ namespace Project.API.Controllers.V1
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtConfig:TokenExpirationMinutes"])),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_appSettings.JwtConfig.TokenExpirationMinutes)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
