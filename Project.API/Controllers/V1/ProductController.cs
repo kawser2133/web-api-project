@@ -1,9 +1,10 @@
 ﻿using Asp.Versioning;
-using Project.Core.Entities.Business;
-using Project.Core.Interfaces.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.API.Helpers;
+using Project.Core.Entities.Business;
+using Project.Core.Interfaces.IServices;
 
 namespace Project.API.Controllers.V1
 {
@@ -22,7 +23,6 @@ namespace Project.API.Controllers.V1
             _productService = productService;
         }
 
-
         [HttpGet("paginated")]
         [AllowAnonymous]
         public async Task<IActionResult> Get(int? pageNumber, int? pageSize, CancellationToken cancellationToken)
@@ -32,18 +32,35 @@ namespace Project.API.Controllers.V1
                 int pageSizeValue = pageSize ?? 10;
                 int pageNumberValue = pageNumber ?? 1;
 
-                //Get peginated data
                 var products = await _productService.GetPaginatedData(pageNumberValue, pageSizeValue, cancellationToken);
 
-                return Ok(products);
+                var response = new ResponseViewModel<PaginatedDataViewModel<ProductViewModel>>
+                {
+                    Success = true,
+                    Message = "Products retrieved successfully",
+                    Data = products
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving products");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+
+                var errorResponse = new ResponseViewModel<IEnumerable<ProductViewModel>>
+                {
+                    Success = false,
+                    Message = "Error retrieving products",
+                    Error = new ErrorViewModel
+                    {
+                        Code = "ERROR_CODE",
+                        Message = ex.Message
+                    }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
-
 
         [HttpGet]
         [AllowAnonymous]
@@ -52,16 +69,34 @@ namespace Project.API.Controllers.V1
             try
             {
                 var products = await _productService.GetAll(cancellationToken);
-                return Ok(products);
+
+                var response = new ResponseViewModel<IEnumerable<ProductViewModel>>
+                {
+                    Success = true,
+                    Message = "Products retrieved successfully",
+                    Data = products
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving products");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+
+                var errorResponse = new ResponseViewModel<IEnumerable<ProductViewModel>>
+                {
+                    Success = false,
+                    Message = "Error retrieving products",
+                    Error = new ErrorViewModel
+                    {
+                        Code = "ERROR_CODE",
+                        Message = ex.Message
+                    }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
-
         }
-
 
         [HttpGet("{id}")]
         [AllowAnonymous]
@@ -70,19 +105,48 @@ namespace Project.API.Controllers.V1
             try
             {
                 var data = await _productService.GetById(id, cancellationToken);
-                return Ok(data);
+
+                var response = new ResponseViewModel<ProductViewModel>
+                {
+                    Success = true,
+                    Message = "Product retrieved successfully",
+                    Data = data
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 if (ex.Message == "No data found")
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                    return StatusCode(StatusCodes.Status404NotFound, new ResponseViewModel<ProductViewModel>
+                    {
+                        Success = false,
+                        Message = "Product not found",
+                        Error = new ErrorViewModel
+                        {
+                            Code = "NOT_FOUND",
+                            Message = "Product not found"
+                        }
+                    });
                 }
+
                 _logger.LogError(ex, $"An error occurred while retrieving the product");
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+
+                var errorResponse = new ResponseViewModel<ProductViewModel>
+                {
+                    Success = false,
+                    Message = "Error retrieving product",
+                    Error = new ErrorViewModel
+                    {
+                        Code = "ERROR_CODE",
+                        Message = ex.Message
+                    }
+                };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Create(ProductCreateViewModel model, CancellationToken cancellationToken)
@@ -93,31 +157,75 @@ namespace Project.API.Controllers.V1
                 if (await _productService.IsExists("Name", model.Name, cancellationToken))
                 {
                     message = $"The product name- '{model.Name}' already exists";
-                    return StatusCode(StatusCodes.Status400BadRequest, message);
+                    return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel<ProductViewModel>
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "DUPLICATE_NAME",
+                            Message = message
+                        }
+                    });
                 }
 
                 if (await _productService.IsExists("Code", model.Code, cancellationToken))
                 {
                     message = $"The product code- '{model.Code}' already exists";
-                    return StatusCode(StatusCodes.Status400BadRequest, message);
+                    return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel<ProductViewModel>
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "DUPLICATE_CODE",
+                            Message = message
+                        }
+                    });
                 }
 
                 try
                 {
                     var data = await _productService.Create(model, cancellationToken);
-                    return Ok(data);
+
+                    var response = new ResponseViewModel<ProductViewModel>
+                    {
+                        Success = true,
+                        Message = "Product created successfully",
+                        Data = data
+                    };
+
+                    return Ok(response);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"An error occurred while adding the product");
                     message = $"An error occurred while adding the product- " + ex.Message;
 
-                    return StatusCode(StatusCodes.Status500InternalServerError, message);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ResponseViewModel<ProductViewModel>
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "ADD_ROLE_ERROR",
+                            Message = message
+                        }
+                    });
                 }
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Please input all required data");
-        }
 
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel<ProductViewModel>
+            {
+                Success = false,
+                Message = "Invalid input",
+                Error = new ErrorViewModel
+                {
+                    Code = "INPUT_VALIDATION_ERROR",
+                    Message = ModelStateHelper.GetErrors(ModelState)
+                }
+            });
+        }
 
         [HttpPut]
         public async Task<IActionResult> Edit(ProductUpdateViewModel model, CancellationToken cancellationToken)
@@ -127,32 +235,75 @@ namespace Project.API.Controllers.V1
                 string message = "";
                 if (await _productService.IsExistsForUpdate(model.Id, "Name", model.Name, cancellationToken))
                 {
-                    message = "The product name- '{model.Name}' already exists";
-                    return StatusCode(StatusCodes.Status400BadRequest, message);
+                    message = $"The product name- '{model.Name}' already exists";
+                    return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "DUPLICATE_NAME",
+                            Message = message
+                        }
+                    });
                 }
 
                 if (await _productService.IsExistsForUpdate(model.Id, "Code", model.Code, cancellationToken))
                 {
                     message = $"The product code- '{model.Code}' already exists";
-                    return StatusCode(StatusCodes.Status400BadRequest, message);
+                    return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "DUPLICATE_CODE",
+                            Message = message
+                        }
+                    });
                 }
 
                 try
                 {
                     await _productService.Update(model, cancellationToken);
-                    return Ok();
+
+                    var response = new ResponseViewModel
+                    {
+                        Success = true,
+                        Message = "Product updated successfully"
+                    };
+
+                    return Ok(response);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"An error occurred while updating the product");
                     message = $"An error occurred while updating the product- " + ex.Message;
 
-                    return StatusCode(StatusCodes.Status500InternalServerError, message);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ResponseViewModel
+                    {
+                        Success = false,
+                        Message = message,
+                        Error = new ErrorViewModel
+                        {
+                            Code = "UPDATE_ROLE_ERROR",
+                            Message = message
+                        }
+                    });
                 }
             }
-            return StatusCode(StatusCodes.Status400BadRequest, "Please input all required data");
-        }
 
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseViewModel
+            {
+                Success = false,
+                Message = "Invalid input",
+                Error = new ErrorViewModel
+                {
+                    Code = "INPUT_VALIDATION_ERROR",
+                    Message = ModelStateHelper.GetErrors(ModelState)
+                }
+            });
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
@@ -160,30 +311,46 @@ namespace Project.API.Controllers.V1
             try
             {
                 await _productService.Delete(id, cancellationToken);
-                return Ok();
+
+                var response = new ResponseViewModel
+                {
+                    Success = true,
+                    Message = "Product deleted successfully"
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
+                if (ex.Message == "No data found")
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, new ResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Product not found",
+                        Error = new ErrorViewModel
+                        {
+                            Code = "NOT_FOUND",
+                            Message = "Product not found"
+                        }
+                    });
+                }
+
                 _logger.LogError(ex, "An error occurred while deleting the product");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the product- " + ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseViewModel
+                {
+                    Success = false,
+                    Message = "Error deleting the product",
+                    Error = new ErrorViewModel
+                    {
+                        Code = "DELETE_ROLE_ERROR",
+                        Message = ex.Message
+                    }
+                });
+
             }
         }
-
-        [HttpGet("PriceCheck/{productId}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> PriceCheck(int productId, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var price = await _productService.PriceCheck(productId, cancellationToken);
-                return Ok(price);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while checking product price");
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while checking product price- {ex.Message}");
-            }
-        }
-
     }
+
 }
