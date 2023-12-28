@@ -1,5 +1,5 @@
 # ASP.NET Core Web API: Secure, Scalable, and Elegant
-Embark on a journey of secure and efficient web development with my latest project! This ASP.NET Core Web API is meticulously crafted, leveraging the power of Security Identity, JWT, and best coding practices.
+Embark on a journey of secure and efficient web development with my latest project! This ASP.NET Core Web API is meticulously crafted, leveraging the power of Security Identity, JWT, API Versioning, and best coding practices.
 
 ## Project Structure
 
