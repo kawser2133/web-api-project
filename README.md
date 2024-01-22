@@ -1,5 +1,5 @@
 # ASP.NET Core Web API: Secure, Scalable, and Elegant
-Explore a meticulously crafted ASP.NET Core Web API, featuring Security Identity, JWT, Unit Testing, and API Versioning. This repository embodies best coding practices, delivering a clean, efficient, and scalable solution. Hopefully day by day I will enrich the application, feel free to ask any questions or share your thoughts.
+Explore a meticulously crafted ASP.NET Core Web API, featuring Security Identity, JWT, Unit Testing, and API Versioning. This repository embodies best coding practices, delivering a clean, efficient, and scalable solution. Feel free to ask any questions or share your thoughts.
 
 ## Project Structure
 
