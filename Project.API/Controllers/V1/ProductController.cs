@@ -23,6 +23,7 @@ namespace Project.API.Controllers.V1
             _productService = productService;
         }
 
+        //Working on the search option here
         [HttpGet("paginated")]
         [AllowAnonymous]
         public async Task<IActionResult> Get(int? pageNumber, int? pageSize, CancellationToken cancellationToken)
