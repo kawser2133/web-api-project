@@ -36,7 +36,7 @@ namespace Project.Core.Services
 
             // Set additional properties or perform other logic as needed
             entity.NormalizedName = model.Name.ToUpper();
-            entity.EntryDate = DateTime.UtcNow;
+            entity.EntryDate = DateTime.Now;
             entity.EntryBy = Convert.ToInt32(_userContext.UserId);
 
             return _roleViewModelMapper.MapModel(await _roleRepository.Create(entity, cancellationToken));
@@ -50,7 +50,7 @@ namespace Project.Core.Services
             _roleUpdateMapper.MapModel(model, existingData);
 
             // Set additional properties or perform other logic as needed
-            existingData.UpdatedDate = DateTime.UtcNow;
+            existingData.UpdatedDate = DateTime.Now;
             existingData.UpdatedBy = Convert.ToInt32(_userContext.UserId);
 
             await _roleRepository.Update(existingData, cancellationToken);
