@@ -46,7 +46,7 @@ namespace Project.Infrastructure.Repositories
                 Email = model.Email,
                 IsActive = true,
                 RoleId = model.RoleId,
-                EntryDate = DateTime.UtcNow,
+                EntryDate = DateTime.Now,
                 EntryBy = Convert.ToInt32(_userContext.UserId)
             };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -86,7 +86,7 @@ namespace Project.Infrastructure.Repositories
             user.UserName = model.UserName;
             user.Email = model.Email;
             user.RoleId = model.RoleId;
-            user.UpdatedDate = DateTime.UtcNow;
+            user.UpdatedDate = DateTime.Now;
             user.UpdatedBy = Convert.ToInt32(_userContext.UserId);
 
             var result = await _userManager.UpdateAsync(user);

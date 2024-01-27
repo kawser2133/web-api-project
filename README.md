@@ -1,5 +1,5 @@
 # ASP.NET Core Web API: Secure, Scalable, and Elegant
-Embark on a journey of secure and efficient web development with my latest project! This ASP.NET Core Web API is meticulously crafted, leveraging the power of Security Identity, JWT, and best coding practices.
+Explore a meticulously crafted ASP.NET Core Web API, featuring Security Identity, JWT, Unit Testing, and API Versioning. This repository embodies best coding practices, delivering a clean, efficient, and scalable solution. Feel free to ask any questions or share your thoughts.
 
 ## Project Structure
 
@@ -40,6 +40,7 @@ This project template includes the following features:
 - **Entity Framework Core**: The project utilizes Entity Framework Core as the ORM (Object-Relational Mapping) tool for data access.
 - **ASP.NET Core API**: The project includes an ASP.NET Core API project that serves as the API layer, handling HTTP requests and responses.
 - **JWT for Token-based Authentication**: Effortlessly manage user sessions, authentication, and authorization with this state-of-the-art token-based approach.
+- **API Versioning**: The project embraces API versioning to support evolutionary changes while preserving backward compatibility.
 - **CRUD Operations**: The project template provides a foundation for implementing complete CRUD (Create, Read, Update, Delete) operations on entities using Entity Framework Core.
 - **Dependency Injection**: The project utilizes the built-in dependency injection container in ASP.NET Core, making it easy to manage and inject dependencies throughout the application.
 - **Unit Testing**: The solution includes separate test projects for unit testing the core, infrastructure, and API layers.

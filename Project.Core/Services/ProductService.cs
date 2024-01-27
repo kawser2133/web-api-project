@@ -47,7 +47,7 @@ namespace Project.Core.Services
             _productUpdateMapper.MapModel(model, existingData);
 
             // Set additional properties or perform other logic as needed
-            existingData.UpdatedDate = DateTime.UtcNow;
+            existingData.UpdatedDate = DateTime.Now;
             existingData.UpdatedBy = Convert.ToInt32(_userContext.UserId);
 
             await _productRepository.Update(existingData, cancellationToken);
