@@ -37,7 +37,7 @@ To use this project template, follow the steps below:
 This project template includes the following features:
 
 - **Clean Architecture**: The project is structured according to the principles of Clean Architecture, which promotes separation of concerns and a clear division of responsibilities.
-- **SOLID Design Principles**: The code adheres to SOLID principles (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion), making it easier to maintain and extend.
+- **[SOLID Design Principles](https://github.com/kawser2133/SOLID-design-principles)**: The code adheres to SOLID principles (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion), making it easier to maintain and extend.
 - **Repository Pattern**: The repository pattern abstracts the data access layer and provides a consistent interface for working with data.
 - **Unit of Work Pattern**: The unit of work pattern helps manage transactions and ensures consistency when working with multiple repositories.
 - **Entity Framework Core**: The project utilizes Entity Framework Core as the ORM (Object-Relational Mapping) tool for data access.
