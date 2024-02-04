@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project.API.Helpers;
+using Project.Core.Common;
 using Project.Core.Entities.Business;
 using Project.Core.Interfaces.IServices;
 
@@ -23,16 +24,54 @@ namespace Project.API.Controllers.V1
             _productService = productService;
         }
 
-        [HttpGet("paginated")]
+        [HttpGet("paginated-data-with-filter")]
         [AllowAnonymous]
-        public async Task<IActionResult> Get(int? pageNumber, int? pageSize, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(int? pageNumber, int? pageSize, string? search, CancellationToken cancellationToken)
         {
             try
             {
                 int pageSizeValue = pageSize ?? 10;
                 int pageNumberValue = pageNumber ?? 1;
 
-                var products = await _productService.GetPaginatedData(pageNumberValue, pageSizeValue, cancellationToken);
+                var filters = new List<ExpressionFilter>();
+                if (!string.IsNullOrWhiteSpace(search) && search != null)
+                {
+                    // Add filters for relevant properties
+                    filters.AddRange(new[]
+                    {
+                        new ExpressionFilter
+                        {
+                            PropertyName = "Code",
+                            Value = search,
+                            Comparison = Comparison.Contains
+                        },
+                        new ExpressionFilter
+                        {
+                            PropertyName = "Name",
+                            Value = search,
+                            Comparison = Comparison.Contains
+                        },
+                        new ExpressionFilter
+                        {
+                            PropertyName = "Description",
+                            Value = search,
+                            Comparison = Comparison.Contains
+                        }
+                    });
+
+                    // Check if the search string represents a valid numeric value for the "Price" property
+                    if (double.TryParse(search, out double price))
+                    {
+                        filters.Add(new ExpressionFilter
+                        {
+                            PropertyName = "Price",
+                            Value = price,
+                            Comparison = Comparison.Equal
+                        });
+                    }
+                }
+
+                var products = await _productService.GetPaginatedDataWithFilter(pageNumberValue, pageSizeValue, filters, cancellationToken);
 
                 var response = new ResponseViewModel<PaginatedDataViewModel<ProductViewModel>>
                 {

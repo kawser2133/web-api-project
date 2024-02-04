@@ -4,6 +4,8 @@ using Project.Core.Interfaces.IRepositories;
 using Project.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Project.Core.Common;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Project.Infrastructure.Repositories
 {
@@ -49,6 +51,28 @@ namespace Project.Infrastructure.Repositories
 
             var data = await query.ToListAsync(cancellationToken);
             var totalCount = await _dbContext.Set<T>().CountAsync(cancellationToken);
+
+            return new PaginatedDataViewModel<T>(data, totalCount);
+        }
+
+        public async Task<PaginatedDataViewModel<T>> GetPaginatedDataWithFilter(int pageNumber, int pageSize, List<ExpressionFilter> filters, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>().AsNoTracking();
+
+            // Apply search criteria if provided
+            if (filters != null && filters.Any())
+            {
+                var expressionTree = ExpressionBuilder.ConstructAndExpressionTree<T>(filters);
+                query = query.Where(expressionTree);
+            }
+
+            // Pagination
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            var totalCount = await query.CountAsync(cancellationToken);
 
             return new PaginatedDataViewModel<T>(data, totalCount);
         }

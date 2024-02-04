@@ -1,4 +1,5 @@
-﻿using Project.Core.Entities.Business;
+﻿using Project.Core.Common;
+using Project.Core.Entities.Business;
 using Project.Core.Interfaces.IMapper;
 using Project.Core.Interfaces.IRepositories;
 using Project.Core.Interfaces.IServices;
@@ -29,6 +30,14 @@ namespace Project.Core.Services
         public virtual async Task<PaginatedDataViewModel<TViewModel>> GetPaginatedData(int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
             var paginatedData = await _repository.GetPaginatedData(pageNumber, pageSize, cancellationToken);
+            var mappedData = _viewModelMapper.MapList(paginatedData.Data);
+            var paginatedDataViewModel = new PaginatedDataViewModel<TViewModel>(mappedData.ToList(), paginatedData.TotalCount);
+            return paginatedDataViewModel;
+        }
+
+        public virtual async Task<PaginatedDataViewModel<TViewModel>> GetPaginatedDataWithFilter(int pageNumber, int pageSize, List<ExpressionFilter> filters, CancellationToken cancellationToken)
+        {
+            var paginatedData = await _repository.GetPaginatedDataWithFilter(pageNumber, pageSize, filters, cancellationToken);
             var mappedData = _viewModelMapper.MapList(paginatedData.Data);
             var paginatedDataViewModel = new PaginatedDataViewModel<TViewModel>(mappedData.ToList(), paginatedData.TotalCount);
             return paginatedDataViewModel;

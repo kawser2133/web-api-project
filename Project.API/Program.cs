@@ -76,6 +76,26 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Database seeding
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Seed the database
+        await ApplicationDbContextSeed.SeedAsync(services, loggerFactory);
+    }
+    catch (Exception ex)
+    {
+        var logger = loggerFactory.CreateLogger<Program>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
