@@ -45,7 +45,7 @@ This project template includes the following features:
 - **JWT for Token-based Authentication**: Effortlessly manage user sessions, authentication, and authorization with this state-of-the-art token-based approach.
 - **API Versioning**: The project embraces API versioning to support evolutionary changes while preserving backward compatibility.
 - **CRUD Operations**: The project template provides a foundation for implementing complete CRUD (Create, Read, Update, Delete) operations on entities using Entity Framework Core.
-- **Dependency Injection**: The project utilizes the built-in dependency injection container in ASP.NET Core, making it easy to manage and inject dependencies throughout the application.
+- **Dependency Injection**: The project utilizes the built-in [dependency injection](https://binarybytez.com/understanding-dependency-injection/) container in ASP.NET Core, making it easy to manage and inject dependencies throughout the application.
 - **Unit Testing**: The solution includes separate test projects for unit testing the core, infrastructure, and API layers.
 
 ## Usage
