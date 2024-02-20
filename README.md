@@ -41,7 +41,7 @@ This project template includes the following features:
 - **Repository Pattern**: The [repository pattern](https://binarybytez.com/understanding-clean-architecture/) abstracts the data access layer and provides a consistent interface for working with data.
 - **Unit of Work Pattern**: The unit of work pattern helps manage transactions and ensures consistency when working with multiple repositories.
 - **Entity Framework Core**: The project utilizes Entity Framework Core as the ORM (Object-Relational Mapping) tool for data access.
-- **ASP.NET Core API**: The project includes an ASP.NET Core API project that serves as the API layer, handling HTTP requests and responses.
+- **ASP.NET Core API**: The project includes an [ASP.NET Core API project](https://binarybytez.com/clean-structured-project/) that serves as the API layer, handling HTTP requests and responses.
 - **JWT for Token-based Authentication**: Effortlessly manage user sessions, authentication, and authorization with this state-of-the-art token-based approach.
 - **API Versioning**: The project embraces API versioning to support evolutionary changes while preserving backward compatibility.
 - **CRUD Operations**: The project template provides a foundation for implementing complete CRUD (Create, Read, Update, Delete) operations on entities using Entity Framework Core.
