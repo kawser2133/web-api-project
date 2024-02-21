@@ -55,7 +55,7 @@ namespace Project.Infrastructure.Repositories
             return new PaginatedDataViewModel<T>(data, totalCount);
         }
 
-        public async Task<PaginatedDataViewModel<T>> GetPaginatedDataWithFilter(int pageNumber, int pageSize, List<ExpressionFilter> filters, CancellationToken cancellationToken = default)
+        public async Task<PaginatedDataViewModel<T>> GetPaginatedData(int pageNumber, int pageSize, List<ExpressionFilter> filters, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Set<T>().AsNoTracking();
 
@@ -76,7 +76,7 @@ namespace Project.Infrastructure.Repositories
 
             return new PaginatedDataViewModel<T>(data, totalCount);
         }
-
+        
         public virtual async Task<PaginatedDataViewModel<T>> GetPaginatedData(List<Expression<Func<T, object>>> includeExpressions, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Set<T>()
@@ -93,6 +93,44 @@ namespace Project.Infrastructure.Repositories
             var totalCount = await _dbContext.Set<T>().CountAsync(cancellationToken);
 
             return new PaginatedDataViewModel<T>(data, totalCount);
+        }
+
+        public async Task<PaginatedDataViewModel<T>> GetPaginatedData(int pageNumber, int pageSize, List<ExpressionFilter> filters, string sortBy, string sortOrder, CancellationToken cancellationToken = default)
+        {
+            var query = _dbContext.Set<T>().AsNoTracking();
+
+            // Apply search criteria if provided
+            if (filters != null && filters.Any())
+            {
+                var expressionTree = ExpressionBuilder.ConstructAndExpressionTree<T>(filters);
+                query = query.Where(expressionTree);
+            }
+
+            // Add sorting
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                var orderByExpression = GetOrderByExpression<T>(sortBy);
+                query = sortOrder?.ToLower() == "desc" ? query.OrderByDescending(orderByExpression) : query.OrderBy(orderByExpression);
+            }
+
+            // Pagination
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            return new PaginatedDataViewModel<T>(data, totalCount);
+        }
+
+        private Expression<Func<T, object>> GetOrderByExpression<T>(string propertyName)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, propertyName);
+            var conversion = Expression.Convert(property, typeof(object));
+
+            return Expression.Lambda<Func<T, object>>(conversion, parameter);
         }
 
         public virtual async Task<T> GetById<Tid>(Tid id, CancellationToken cancellationToken = default)

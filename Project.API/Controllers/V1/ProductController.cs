@@ -24,14 +24,16 @@ namespace Project.API.Controllers.V1
             _productService = productService;
         }
 
-        [HttpGet("paginated-data-with-filter")]
+        [HttpGet("paginated-data")]
         [AllowAnonymous]
-        public async Task<IActionResult> Get(int? pageNumber, int? pageSize, string? search, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(int? pageNumber, int? pageSize, string? search, string? sortBy, string? sortOrder, CancellationToken cancellationToken)
         {
             try
             {
                 int pageSizeValue = pageSize ?? 10;
                 int pageNumberValue = pageNumber ?? 1;
+                sortBy = sortBy ?? "Id";
+                sortOrder = sortOrder ?? "desc";
 
                 var filters = new List<ExpressionFilter>();
                 if (!string.IsNullOrWhiteSpace(search) && search != null)
@@ -71,7 +73,7 @@ namespace Project.API.Controllers.V1
                     }
                 }
 
-                var products = await _productService.GetPaginatedDataWithFilter(pageNumberValue, pageSizeValue, filters, cancellationToken);
+                var products = await _productService.GetPaginatedData(pageNumberValue, pageSizeValue, filters, sortBy, sortOrder, cancellationToken);
 
                 var response = new ResponseViewModel<PaginatedDataViewModel<ProductViewModel>>
                 {
