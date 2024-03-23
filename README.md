@@ -57,7 +57,7 @@ The project template provides a starting point for building RESTful APIs using A
 3. **Services**: The `Core` project contains services that encapsulate the business logic and orchestrate the operations on repositories. Update or create new services to handle CRUD operations on your entities.
 4. **Controllers**: The `API` project contains controllers that handle HTTP requests and responses. Update or create new controllers to expose the CRUD endpoints for your entities. Implement the appropriate HTTP methods (GET, POST, PUT, DELETE) and perform actions on the core services accordingly.
 
-Make sure to update the routes, validation, and error-handling logic to align with your application requirements and best practices.
+Make sure to update the routes, validation, and error-handling logic to align with your application requirements and [best practices](https://binarybytez.com/performance-optimization-and-monitoring-in-asp-net-core/).
 
 ## Authors
 
