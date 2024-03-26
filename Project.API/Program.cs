@@ -15,6 +15,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PrimaryDbConnection")));
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
+// Add caching services
+builder.Services.AddMemoryCache();
+
 // Register ILogger service
 builder.Services.AddLogging(loggingBuilder =>
 {

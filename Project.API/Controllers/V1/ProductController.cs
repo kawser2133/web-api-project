@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Project.API.Helpers;
 using Project.Core.Common;
 using Project.Core.Entities.Business;
@@ -17,11 +18,13 @@ namespace Project.API.Controllers.V1
     {
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService _productService;
+        private readonly IMemoryCache _memoryCache;
 
-        public ProductController(ILogger<ProductController> logger, IProductService productService)
+        public ProductController(ILogger<ProductController> logger, IProductService productService, IMemoryCache memoryCache)
         {
             _logger = logger;
             _productService = productService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet("paginated-data")]
@@ -145,13 +148,30 @@ namespace Project.API.Controllers.V1
         {
             try
             {
-                var data = await _productService.GetById(id, cancellationToken);
+                var product = new ProductViewModel();
+
+                // Attempt to retrieve the product from the cache
+                if (_memoryCache.TryGetValue($"Product_{id}", out ProductViewModel cachedProduct))
+                {
+                    product = cachedProduct;
+                }
+                else
+                {
+                    // If not found in cache, fetch the product from the data source
+                    product = await _productService.GetById(id, cancellationToken);
+
+                    if (product != null)
+                    {
+                        // Cache the product with an expiration time of 10 minutes
+                        _memoryCache.Set($"Product_{id}", product, TimeSpan.FromMinutes(10));
+                    }
+                }
 
                 var response = new ResponseViewModel<ProductViewModel>
                 {
                     Success = true,
                     Message = "Product retrieved successfully",
-                    Data = data
+                    Data = product
                 };
 
                 return Ok(response);
